@@ -3,7 +3,9 @@
 import sqlite3
 from typing import List, Tuple
 
-def get_templates(category: str = None, tags: list = None) -> List[Tuple]:
+def get_templates(category: str = None,
+                  tags: list = None,
+                  database:str = "data\\db.sqlite3") -> List[Tuple]:
     """
     Returns the name and text of all templates matching the specified
     category and tags. Both parameters are optional.
@@ -11,11 +13,12 @@ def get_templates(category: str = None, tags: list = None) -> List[Tuple]:
     Args:
         category: The name of the category to filter templates by (optional).
         tags: A list of tag names to filter templates by (optional).
+        db: The database to connect two (optional).
 
     Returns:
         A list of tuples, each containing the template name and text.
     """
-    with sqlite3.connect("..\\data\\db.sqlite3") as db:
+    with sqlite3.connect(database) as db:
         cursor = db.cursor()
 
         # Base query.
@@ -55,4 +58,4 @@ def get_templates(category: str = None, tags: list = None) -> List[Tuple]:
 if __name__ == "__main__":
     import os
     os.chdir(os.path.dirname(os.path.abspath(__file__)))
-    print(get_templates())
+    print(get_templates(database="..\\data\\db.sqlite3"))
