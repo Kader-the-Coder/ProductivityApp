@@ -3,7 +3,7 @@
 import tkinter as tk
 from tkinter import ttk
 from data import config
-
+from utils import database
 
 def set_widgets(frame):
     """Set up a scrollable frame and add widgets within the given frame."""
@@ -34,10 +34,11 @@ def set_widgets(frame):
             for widget in row_widgets:
                 widget.config(bg="SystemButtonFace")
 
-        for i in range(10):
-            # Create widgets for the row
+        # Create widgets for each of the templates in database.
+        templates = database.get_templates()
+        for i, template in enumerate(templates):
             checkbutton = tk.Checkbutton(scrollable_frame,
-                                         text=f"Button {i}",
+                                         text=f"{template[0]}",
                                          anchor="w")
             button = tk.Button(scrollable_frame,
                                text="Edit",

@@ -2,15 +2,17 @@
 
 from tkinter import ttk
 from data import config
-
+from utils import database
 
 def set_widgets(frame):
     """Set up and configure buttons in the given frame."""
     style = ttk.Style()
     style.configure("button.TButton", background=config.COLOR_2)
-    button1 = ttk.Button(frame, text="A", width=4, style="button.TButton",)
-    button1.pack(fill="x")
-    button2 = ttk.Button(frame, text="B", width=4, style="button.TButton",)
-    button2.pack(fill="x")
+
+    button_data = database.get_quick_copy_buttons()
+    for _, data in enumerate(button_data):
+        button = ttk.Button(frame, text=data[0], width=4, style="button.TButton",)
+        button.pack(fill="x")
+    
     button_open = ttk.Button(frame, text="^", width=4, style="button.TButton",)
     button_open.pack(fill="x", side="bottom")
