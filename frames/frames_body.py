@@ -25,12 +25,12 @@ def set_widgets(frame):
     def add_widgets(scrollable_frame):
         """Add widgets to the scrollable frame."""
         def on_enter_row(_event, row_widgets):
-            """Change background color the widget on hover."""
+            """Change background COLOR_2 the widget on hover."""
             for widget in row_widgets:
                 widget.config(bg="darkgray")
 
         def on_leave_row(_event, row_widgets):
-            """Revert background color of widget on mouse leave."""
+            """Revert background COLOR_2 of widget on mouse leave."""
             for widget in row_widgets:
                 widget.config(bg="SystemButtonFace")
 
@@ -82,7 +82,7 @@ def set_widgets(frame):
 
     # Create a frame inside the canvas
     style = ttk.Style()
-    style.configure("frame.TFrame", background=config.COLOR)
+    style.configure("frame.TFrame", background=config.COLOR_2)
 
     # Create canvas and scrollable_frame
     scrollable_frame = ttk.Frame(canvas, style="frame.TFrame")

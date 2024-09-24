@@ -7,7 +7,7 @@ from data import config
 def set_widgets(frame):
     """Set up and configure buttons in the given frame."""
     style = ttk.Style()
-    style.configure("button.TButton", background=config.COLOR)
+    style.configure("button.TButton", background=config.COLOR_2)
     button1 = ttk.Button(frame, text="A", width=4, style="button.TButton",)
     button1.pack(fill="x")
     button2 = ttk.Button(frame, text="B", width=4, style="button.TButton",)
