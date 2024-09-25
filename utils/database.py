@@ -4,6 +4,29 @@ import sqlite3
 from typing import List, Tuple
 
 
+def get_categories(database:str = "data\\db.sqlite3") -> List:
+    """
+    Returns the name and text of all quick copy buttons
+
+    Args:
+        database: The database to connect two (optional).
+
+    Returns:
+        A list of tuples, each containing the quick copy button
+        n
+    """
+    with sqlite3.connect(database) as db:
+        cursor = db.cursor()
+        query = '''
+            SELECT category_name
+            FROM category
+        '''
+        cursor.execute(query)
+        data = cursor.fetchall()
+
+    return data
+
+
 def get_quick_copy_buttons(database:str = "data\\db.sqlite3") -> List[Tuple]:
     """
     Returns the name and text of all quick copy buttons
@@ -83,5 +106,5 @@ if __name__ == "__main__":
     import os
     os.chdir(os.path.dirname(os.path.abspath(__file__)))
     #print(get_templates(database="..\\data\\db.sqlite3"))
-    print(get_quick_copy_buttons(database="..\\data\\db.sqlite3"))
-    
+    #print(get_quick_copy_buttons(database="..\\data\\db.sqlite3"))
+    print(get_categories(database="..\\data\\db.sqlite3"))
