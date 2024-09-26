@@ -114,15 +114,15 @@ def set_widgets(frame):
     # Create and add tabs for each category in the database
     notebook = ttk.Notebook(frame)
     notebook.grid(row=0, column=0, sticky="nsew")
-    for _, category in enumerate(database.get_categories()):
+    categories = database.get_categories()
+    for _, category in enumerate(categories):
         tab_frame = ttk.Frame(notebook)
-        notebook.add(tab_frame, text=category[0])
+        tab_label = f"{category[0]}"
+        notebook.add(tab_frame, text=tab_label)
 
-    # Add required widgets to each tab
-    for i, tab in enumerate(notebook.winfo_children()):
-        tab_text = notebook.tab(i, option="text")
-        canvas, scrollable_frame = add_scrollable_frame(tab)
-        add_widgets(tab_text, scrollable_frame, canvas)
+        # Make tab scrollable and add widgets to tab.
+        canvas, scrollable_frame = add_scrollable_frame(tab_frame)
+        add_widgets(category[0], scrollable_frame, canvas)
 
 
     # DEBUG -------------------------------------------------------------------
@@ -132,13 +132,13 @@ def set_widgets(frame):
         """Handle tab change events."""
         notebook = event.widget
         selected_tab_id = notebook.select()
-        selected_index = notebook.index(selected_tab_id)
+        # selected_index = notebook.index(selected_tab_id)
 
         # DEBUG
-        selected_text = notebook.tab(selected_tab_id, "text")
+        # selected_text = notebook.tab(selected_tab_id, "text")
         print(f"Selected Tab ID: {selected_tab_id}")
-        print(f"Selected Tab Index: {selected_index}")
-        print(f"Selected Tab Text: {selected_text}")
+        # print(f"Selected Tab Index: {selected_index}")
+        # print(f"Selected Tab Text: {selected_text}")
 
 
     notebook.bind("<<NotebookTabChanged>>", on_tab_change)  # DEBUG BINDING
