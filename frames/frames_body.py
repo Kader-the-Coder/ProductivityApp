@@ -111,9 +111,17 @@ def set_widgets(frame):
     frame.grid_rowconfigure(0, weight=1)
     frame.grid_columnconfigure(0, weight=1)
 
+    # Create a notebook to hold the tabs for each category
+    # Set the style of the tabs
+    style = ttk.Style()
+    style.configure("Custom.TNotebook.Tab", foreground="black")
+    style.map("TNotebook.Tab",
+    foreground=[('selected', 'black'), ('!selected', '#665956')],
+    #background=[('selected', 'black'), ('!selected', 'white')]
+    )
+    notebook = ttk.Notebook(frame, style='TNotebook')
+
     # Create and add tabs for each category in the database
-    notebook = ttk.Notebook(frame)
-    notebook.grid(row=0, column=0, sticky="nsew")
     categories = database.get_categories()
     for _, category in enumerate(categories):
         tab_frame = ttk.Frame(notebook)
@@ -123,6 +131,8 @@ def set_widgets(frame):
         # Make tab scrollable and add widgets to tab.
         canvas, scrollable_frame = add_scrollable_frame(tab_frame)
         add_widgets(category[0], scrollable_frame, canvas)
+
+    notebook.grid(row=0, column=0, sticky="nsew")
 
 
     # DEBUG -------------------------------------------------------------------
