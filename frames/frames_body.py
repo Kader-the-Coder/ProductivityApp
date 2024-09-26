@@ -2,111 +2,143 @@
 
 import tkinter as tk
 from tkinter import ttk
-from data import config
+# from data import config
 from utils import database
+
+
+def on_mouse_wheel(event, canvas):
+    """Scroll the canvas with the mouse wheel."""
+    scroll_speed = 1
+    direction = -scroll_speed if event.delta > 0 else scroll_speed
+    canvas.yview_scroll(direction, "units")
+
+
+def bind_scroll_events(widget, canvas):
+    """Bind mouse wheel events to given widget for scrolling."""
+    widget.bind("<MouseWheel>", lambda e: on_mouse_wheel(e, canvas))  # Windows and macOS
+    widget.bind("<Button-4>", lambda e: canvas.yview_scroll(-1, "units"))  # Linux scroll up
+    widget.bind("<Button-5>", lambda e: canvas.yview_scroll(1, "units"))   # Linux scroll down
+
+
+def highlight_row(_event, row_widgets, highlight=True):
+    """Change background color of a widget on hover."""
+    color = "darkgray" if highlight else "SystemButtonFace"
+    for widget in row_widgets:
+        widget.config(bg=color)
+
+
+def create_row_widgets(canvas, scrollable_frame, template, row_index):
+    """Create and add row widgets to scrollable frame."""
+    checkbutton = tk.Checkbutton(scrollable_frame, text=f"{template[0]}", anchor="w")
+    button = tk.Button(scrollable_frame, text="Edit", width=4)
+
+    # Place widgets
+    checkbutton.grid(row=row_index, column=0, sticky="we")
+    button.grid(row=row_index, column=1, sticky="e")
+
+    # Bind hover events for row highlight
+    row_widgets = [checkbutton, button]
+    for widget in row_widgets:
+        widget.bind(
+            "<Enter>",
+            lambda event, row=row_widgets: highlight_row(event, row)
+            )
+        widget.bind(
+            "<Leave>",
+            lambda event, row=row_widgets: highlight_row(event, row, highlight=False)
+            )
+
+    # Apply bindings to widgets
+    bind_scroll_events(checkbutton, canvas)
+    bind_scroll_events(button, canvas)
+
+    # Ensure widgets take up the entire width of scrollable frame
+    scrollable_frame.grid_columnconfigure(0, weight=1)
+    scrollable_frame.grid_columnconfigure(1, weight=0)
+
+
+def add_widgets(category, scrollable_frame, canvas):
+    """Add widgets to scrollable frame."""
+    templates = database.get_templates(category)
+    for i, template in enumerate(templates):
+        create_row_widgets(canvas, scrollable_frame, template, i)
+
+
+def configure_scroll_region(canvas, scrollable_frame):
+    """Configure scroll region of canvas based on scrollable frame."""
+    bbox = scrollable_frame.bbox()
+    if bbox:  # Check if bbox is valid
+        canvas.configure(scrollregion=bbox)
+
+
+def resize_canvas(event, canvas, window_id):
+    """Resize the window_id to match the canvas width."""
+    canvas_width = event.width
+    canvas.itemconfig(window_id, width=canvas_width)
+
+
+def add_scrollable_frame(frame):
+    """Create a scrollable canvas with a frame inside for content."""
+    canvas = tk.Canvas(frame, highlightthickness=0)
+    canvas.grid(row=0, column=0, sticky="nsew")
+
+    scrollbar = ttk.Scrollbar(frame, orient="vertical", command=canvas.yview)
+    scrollbar.grid(row=0, column=1, sticky="ns")
+    canvas.configure(yscrollcommand=scrollbar.set)
+
+    scrollable_frame = ttk.Frame(canvas)
+    window_id = canvas.create_window((0, 0), window=scrollable_frame, anchor="nw")
+
+    scrollable_frame.bind(
+        "<Configure>",
+        lambda _event: configure_scroll_region(canvas, scrollable_frame)
+        )
+    canvas.bind(
+        "<Configure>",
+        lambda event: resize_canvas(event, canvas, window_id)
+        )
+
+    frame.grid_rowconfigure(0, weight=1)
+    frame.grid_columnconfigure(0, weight=1)
+
+    bind_scroll_events(scrollable_frame, canvas)
+
+    return canvas, scrollable_frame
+
 
 def set_widgets(frame):
     """Set up a scrollable frame and add widgets within the given frame."""
+    frame.grid_rowconfigure(0, weight=1)
+    frame.grid_columnconfigure(0, weight=1)
 
-    def on_mouse_wheel(event):
-        """Scroll the canvas with the mouse wheel."""
-        canvas_height = canvas.bbox("all")[3]
-        frame_height = frame.winfo_height()
-
-        if canvas_height > frame_height:
-            canvas.yview_scroll(int(-1 * (event.delta / 120)), "units")
-
-    def bind_to_widget(widget):
-        """Bind mouse wheel events to the given widget for scrolling."""
-        widget.bind("<MouseWheel>", on_mouse_wheel)  # Windows and macOS
-        widget.bind("<Button-4>", on_mouse_wheel)  # Linux scroll up
-        widget.bind("<Button-5>", on_mouse_wheel)  # Linux scroll down
-
-    def add_widgets(category, scrollable_frame):
-        """Add widgets to the scrollable frame."""
-        def on_enter_row(_event, row_widgets):
-            """Change background COLOR_2 the widget on hover."""
-            for widget in row_widgets:
-                widget.config(bg="darkgray")
-
-        def on_leave_row(_event, row_widgets):
-            """Revert background COLOR_2 of widget on mouse leave."""
-            for widget in row_widgets:
-                widget.config(bg="SystemButtonFace")
-
-        # Create widgets for each of the templates in database.
-        templates = database.get_templates(category)
-        for i, template in enumerate(templates):
-            checkbutton = tk.Checkbutton(scrollable_frame,
-                                         text=f"{template[0]}",
-                                         anchor="w")
-            button = tk.Button(scrollable_frame,
-                               text="Edit",
-                               width=4)
-
-            # Place widgets in the grid
-            checkbutton.grid(row=i, column=0, sticky="we")
-            button.grid(row=i, column=1, sticky="e")
-
-            # Bind the mouse enter and leave events for row highlight
-            row_widgets = [checkbutton, button]
-            for widget in row_widgets:
-                widget.bind("<Enter>", lambda event,
-                            row=row_widgets: on_enter_row(event, row))
-                widget.bind("<Leave>", lambda event,
-                            row=row_widgets: on_leave_row(event, row))
-
-            # Apply bindings to widgets
-            bind_to_widget(checkbutton)
-            bind_to_widget(button)
-
-            # Have widgets take up the entire width of scrollable_frame
-            scrollable_frame.grid_columnconfigure(0, weight=1)
-            scrollable_frame.grid_columnconfigure(1, weight=0)
-
-    def configure_scrollable_frame(event):
-        """Update scrollable frame width to match canvas width."""
-        canvas_width = event.width
-        scrollable_frame.config(width=canvas_width)
-        canvas.itemconfig(window_id, width=canvas_width)
-
-
+    # Create and add tabs for each category in the database
     notebook = ttk.Notebook(frame)
     notebook.grid(row=0, column=0, sticky="nsew")
+    for _, category in enumerate(database.get_categories()):
+        tab_frame = ttk.Frame(notebook)
+        notebook.add(tab_frame, text=category[0])
 
-    # Creating tabs for each category
-    categories = database.get_categories()
-    for _, category in enumerate(categories):
-        category_name = category[0]  # Use a unique variable for category name
-        tab = ttk.Frame(notebook)
-        notebook.add(tab, text=category_name)
-
-        # Create canvas and vertical scrollbar for each tab
-        canvas = tk.Canvas(tab, highlightthickness=0)
-        canvas.grid(row=1, column=0, sticky="nsew")
-
-        scrollbar = ttk.Scrollbar(tab, orient="vertical", command=canvas.yview)
-        scrollbar.grid(row=1, column=1, sticky="ns")
-
-        canvas.configure(yscrollcommand=scrollbar.set)
-
-        # Create the scrollable frame inside the canvas for each tab
-        scrollable_frame = ttk.Frame(canvas, style="frame.TFrame")
-        window_id = canvas.create_window((0, 0), window=scrollable_frame, anchor="nw")
-
-        # Bind events for this specific tab
-        canvas.bind("<Configure>", lambda e, c=canvas, w_id=window_id, sf=scrollable_frame: configure_scrollable_frame(e, c, w_id, sf))
-        scrollable_frame.bind("<Configure>", lambda e, c=canvas: c.configure(scrollregion=c.bbox("all")))
-
-        # Bind mouse wheel to this tab's canvas and scrollable frame
-        bind_to_widget(canvas)
-        bind_to_widget(scrollable_frame)
-
-        # Add widgets to the scrollable_frame in this tab, pass category_name to add_widgets
-        add_widgets(category_name, scrollable_frame)
+    # Add required widgets to each tab
+    for i, tab in enumerate(notebook.winfo_children()):
+        tab_text = notebook.tab(i, option="text")
+        canvas, scrollable_frame = add_scrollable_frame(tab)
+        add_widgets(tab_text, scrollable_frame, canvas)
 
 
-    # Make the frame expandable
-    frame.grid_rowconfigure(0, weight=0)
-    frame.grid_rowconfigure(1, weight=1)
-    frame.grid_columnconfigure(0, weight=1)
+    # DEBUG -------------------------------------------------------------------
+
+
+    def on_tab_change(event):
+        """Handle tab change events."""
+        notebook = event.widget
+        selected_tab_id = notebook.select()
+        selected_index = notebook.index(selected_tab_id)
+
+        # DEBUG
+        selected_text = notebook.tab(selected_tab_id, "text")
+        print(f"Selected Tab ID: {selected_tab_id}")
+        print(f"Selected Tab Index: {selected_index}")
+        print(f"Selected Tab Text: {selected_text}")
+
+
+    notebook.bind("<<NotebookTabChanged>>", on_tab_change)  # DEBUG BINDING

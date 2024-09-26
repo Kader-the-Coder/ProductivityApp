@@ -24,6 +24,7 @@ class ProductivityApp:
         root.geometry(f"{config.DEFAULT_WIDTH}x{config.DEFAULT_HEIGHT}")
         root.config(bg=config.COLOR_1)
         root.wm_attributes('-topmost', 1)
+        root.bind("<Button-1>", self.debug_widget)  # Debug binding
 
     def configure_styles(self):
         """Set up the styles for the application."""
@@ -111,14 +112,19 @@ class ProductivityApp:
         root.grid_columnconfigure(1, weight=1)
 
     def on_resize(self, event):
-        """Debug function to get the current window size."""
+        """Debug method to get the current window size."""
         width = event.width
         height = event.height
         print(f"Window resized to: {width}x{height}")
+
+    def debug_widget(self, event):
+        """Debug method to get the widget being clicked."""
+        widget = event.widget  # Get the clicked widget
+        print(f"Clicked widget: {widget} of type {type(widget).__name__}")
 
 
 if __name__ == "__main__":
     main_root = tk.Tk()
     app = ProductivityApp(main_root)
-    main_root.bind("<Configure>", app.on_resize)  # DEBUG BINDING
+    # main_root.bind("<Configure>", app.on_resize)  # DEBUG BINDING
     main_root.mainloop()
