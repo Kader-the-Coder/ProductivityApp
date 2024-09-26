@@ -41,40 +41,47 @@ class ProductivityApp:
 
     def create_frames(self, root):
         """Create and place frames and widgets."""
-        self.add_frame(  # Add top frame
+        
+        # Add top frame
+        self.add_frame(
             root, "frameTop.TFrame", frames_top.set_widgets,
             row=0, col=0, colspan=3, width=400, height=32
         )
-        self.add_frame(  # Add left frame
+
+        # Add left frame (Side button frame)
+        self.add_frame(
             root, "frameLeft.TFrame", frames_left.set_widgets,
             row=1, col=0, rowspan=6, width=32, height=250
         )
-        self.create_body_section(root, row=1, col=1)  # Add top body frame
-        self.create_body_section(root, row=5, col=1)  # Add top body frame
-        self.add_frame(  # Add body frame
+
+        # Add top body frame
+        self.create_body_section(root)
+
+        # Add bottom frame
+        self.add_frame(
             root, "frameTop.TFrame", frames_bottom.set_widgets,
             row=8, col=0, colspan=3, width=400, height=32
         )
 
-    def create_body_section(self, root, row, col):
+    def create_body_section(self, root):
         """Create the body section with search entry and buttons."""
         search_entry = ttk.Entry(root, style="entry.TEntry")
         search_entry.grid(
-            row=row, column=col, columnspan=2,
+            row=1, column=1, columnspan=2,
             padx=config.PADDING, pady=config.PADDING,
             sticky="nsew"
         )
 
         self.add_frame(
             root, "frameBody.TFrame", frames_body.set_widgets,
-            row=row + 1, col=col, colspan=2, width=280
+            row=2, col=1, rowspan=5, colspan=2, width=280
         )
 
         copy_button = ttk.Button(
             root, text="Copy", style="button.TButton"
         )
         copy_button.grid(
-            row=row + 2, column=col + 1,
+            row=7, column=2,
             padx=config.PADDING, pady=config.PADDING,
             sticky="e"
         )
