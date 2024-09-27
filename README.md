@@ -1,2 +1,2 @@
-# ProductivityApp
-A app that increases productivity by x %
+# TemplatePro
+Manages and utilizes templates in a subjectively professional manner.
