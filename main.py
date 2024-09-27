@@ -124,7 +124,7 @@ class ProductivityApp:
                     associated_text = getattr(widget, "associated_text", None)
                     if associated_text:
                         associated_texts.append(associated_text)
-                    widget.checked = 0
+                    widget.checked.set(0)
 
             # Join all the associated texts with newline characters
             text_to_copy = "\n".join(associated_texts)
