@@ -104,6 +104,10 @@ class ProductivityApp:
         )
 
         def copy_checked():
+            """
+            Copies all associated texts from the checked Checkboxes in
+            the selected tab to clipboard.
+            """
             text_to_copy = ""
 
             # Get the frame containing the checkboxes in the selected tab
