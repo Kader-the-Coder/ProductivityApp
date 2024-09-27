@@ -6,6 +6,7 @@ from frames import (
     frames_top, frames_left, frames_body, frames_bottom
 )
 from data import config
+from utils.copy import copy
 
 
 class ProductivityApp:
@@ -25,7 +26,7 @@ class ProductivityApp:
         root.geometry(f"{config.DEFAULT_WIDTH}x{config.DEFAULT_HEIGHT}")
         root.config(bg=config.COLOR_1)
         root.wm_attributes('-topmost', 1)
-        root.bind("<Button-1>", self.debug_widget)  # Debug binding
+        # root.bind("<Button-1>", self.debug_widget)  # Debug binding
 
     def configure_styles(self):
         """Set up the styles for the application."""
@@ -102,8 +103,33 @@ class ProductivityApp:
             row=2, col=1, rowspan=5, colspan=2, width=280
         )
 
+        def copy_checked():
+            text_to_copy = ""
+
+            # Get the frame containing the checkboxes in the selected tab
+            notebook = body_frame.winfo_children()[0]
+            selected_tab = notebook.nametowidget(notebook.select())
+            canvas = selected_tab.winfo_children()[0]
+            scrollable_frame_id = canvas.find_all()[0]
+            scrollable_frame = canvas.nametowidget(canvas.itemcget(scrollable_frame_id, 'window'))
+
+            # Retrieve the associated text from all checked Checkboxes
+            associated_texts = []
+            for widget in scrollable_frame.winfo_children():
+                if isinstance(widget, tk.Checkbutton) and widget.checked.get():
+                    associated_text = getattr(widget, "associated_text", None)
+                    if associated_text:
+                        associated_texts.append(associated_text)
+                    widget.checked = 0
+
+            # Join all the associated texts with newline characters
+            text_to_copy = "\n".join(associated_texts)
+                            
+            copy(text_to_copy)
+
+
         copy_button = ttk.Button(
-            root, text="Copy", style="button.TButton"
+            root, text="Copy", style="button.TButton", command=copy_checked
         )
         copy_button.grid(
             row=7, column=2,

@@ -35,7 +35,16 @@ def highlight_row(_event, row_widgets, highlight=True):
 
 def create_row_widgets(canvas, scrollable_frame, template, row_index):
     """Create and add row widgets to scrollable frame."""
-    checkbutton = tk.Checkbutton(scrollable_frame, text=f"{template[0]}", anchor="w")
+    checked = tk.IntVar()
+    checkbutton = tk.Checkbutton(
+        scrollable_frame,
+        text=f"{template[0]}",
+        anchor="w",
+        variable=checked,
+        )
+    checkbutton.checked = checked
+    checkbutton.associated_text = template[1]
+
     button = tk.Button(scrollable_frame, text="Edit", width=4)
 
     # Place widgets
