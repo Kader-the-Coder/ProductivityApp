@@ -10,6 +10,7 @@ from data import config
 
 class ProductivityApp:
     """Main application class for the Productivity App."""
+    
 
     def __init__(self, root):
         """Initialize the application."""
@@ -17,6 +18,7 @@ class ProductivityApp:
         self.configure_styles()
         self.create_frames(root)
         self.configure_grid(root)
+        self.default_tab = 0
 
     def configure_root_window(self, root):
         """Configure the main window."""
@@ -24,7 +26,7 @@ class ProductivityApp:
         root.geometry(f"{config.DEFAULT_WIDTH}x{config.DEFAULT_HEIGHT}")
         root.config(bg=config.COLOR_1)
         root.wm_attributes('-topmost', 1)
-        # root.bind("<Button-1>", self.debug_widget)  # Debug binding
+        root.bind("<Button-1>", self.debug_widget)  # Debug binding
 
     def configure_styles(self):
         """Set up the styles for the application."""
@@ -74,7 +76,7 @@ class ProductivityApp:
             # Destroy each and recreate each widget in body frame (HIGH CPU - OPTIMIZATION NEEDED)
             for widget in body_frame.winfo_children():
                 widget.destroy()
-            frames_body.set_widgets(body_frame, current_text)
+            frames_body.set_widgets(body_frame, self, current_text, self.default_tab)
 
         text_var = tk.StringVar()
         text_var.trace_add("write", on_text_change)
@@ -86,7 +88,7 @@ class ProductivityApp:
         )
 
         body_frame = self.add_frame(
-            root, "frameBody.TFrame", frames_body.set_widgets,
+            root, "frameBody.TFrame", lambda frame: frames_body.set_widgets(frame, self),
             row=2, col=1, rowspan=5, colspan=2, width=280
         )
 

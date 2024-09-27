@@ -14,7 +14,13 @@ def on_mouse_wheel(event, canvas):
 
 
 def bind_scroll_events(widget, canvas):
-    """Bind mouse wheel events to given widget for scrolling."""
+    """
+    Bind mouse wheel events to given widget for scrolling.
+
+    NOTE: This function exists due to a bounding box issue in the
+    configure_scroll_region function and should be sorted out at a
+    later date.
+    """
     widget.bind("<MouseWheel>", lambda e: on_mouse_wheel(e, canvas))  # Windows and macOS
     widget.bind("<Button-4>", lambda e: canvas.yview_scroll(-1, "units"))  # Linux scroll up
     widget.bind("<Button-5>", lambda e: canvas.yview_scroll(1, "units"))   # Linux scroll down
@@ -66,9 +72,15 @@ def add_widgets(category, scrollable_frame, canvas, tags=None):
 
 def configure_scroll_region(canvas, scrollable_frame):
     """Configure scroll region of canvas based on scrollable frame."""
+    # Get the bounding box of the scrollable_frame
     bbox = scrollable_frame.bbox()
     if bbox:  # Check if bbox is valid
         canvas.configure(scrollregion=bbox)
+
+        # Adjust the scrollregion if the content height is less than the canvas height
+        canvas_height = canvas.winfo_height()
+        if bbox[3] <= canvas_height:  # bbox[3] is the bottom y coordinate
+            canvas.configure(scrollregion=(0, 0, 0, canvas_height))
 
 
 def resize_canvas(event, canvas, window_id):
@@ -106,7 +118,7 @@ def add_scrollable_frame(frame):
     return canvas, scrollable_frame
 
 
-def set_widgets(frame, tags = None):
+def set_widgets(frame, instance=None, tags = None, tab_opened=0):
     """Set up a scrollable frame and add widgets within the given frame."""
     frame.grid_rowconfigure(0, weight=1)
     frame.grid_columnconfigure(0, weight=1)
@@ -116,9 +128,8 @@ def set_widgets(frame, tags = None):
     style = ttk.Style()
     style.configure("Custom.TNotebook.Tab", foreground="black")
     style.map("TNotebook.Tab",
-    foreground=[('selected', 'black'), ('!selected', '#665956')],
-    #background=[('selected', 'black'), ('!selected', 'white')]
-    )
+        foreground=[('selected', 'black'), ('!selected', '#665956')],
+        )
     notebook = ttk.Notebook(frame, style='TNotebook')
 
     # Create and add tabs for each category in the database
@@ -133,6 +144,7 @@ def set_widgets(frame, tags = None):
         add_widgets(category[0], scrollable_frame, canvas, tags)
 
     notebook.grid(row=0, column=0, sticky="nsew")
+    notebook.select(tab_opened)
 
 
     # DEBUG -------------------------------------------------------------------
@@ -142,7 +154,7 @@ def set_widgets(frame, tags = None):
         """Handle tab change events."""
         notebook = event.widget
         selected_tab_id = notebook.select()
-        # selected_index = notebook.index(selected_tab_id)
+        instance.default_tab = notebook.index(selected_tab_id)
 
         # DEBUG
         # selected_text = notebook.tab(selected_tab_id, "text")
@@ -150,5 +162,5 @@ def set_widgets(frame, tags = None):
         # print(f"Selected Tab Index: {selected_index}")
         # print(f"Selected Tab Text: {selected_text}")
 
-
-    # notebook.bind("<<NotebookTabChanged>>", on_tab_change)  # DEBUG BINDING
+    if instance:
+        notebook.bind("<<NotebookTabChanged>>", on_tab_change)  # DEBUG BINDING
