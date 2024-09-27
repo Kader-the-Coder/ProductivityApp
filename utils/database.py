@@ -86,11 +86,10 @@ def get_templates(category: str = None,
 
         # Add filtering by tags if provided
         if tags:
-            # Placeholder for variable length 'IN' clause for multiple tags
-            placeholders = ','.join('?' for _ in tags)
-            query += f' AND tg.tag_name IN ({placeholders})'
-            params.extend(tags)
-
+            like_conditions = ' OR '.join('tg.tag_name LIKE LOWER(?)' for _ in tags)
+            query += f' AND ({like_conditions})'
+            # Modify tags to include wildcards for partial matching
+            params.extend([f'%{tag}%' for tag in tags])
         # Grouping to avoid duplicates in case of multiple tags
         query += ' GROUP BY t.template_id'
 
@@ -105,6 +104,8 @@ def get_templates(category: str = None,
 if __name__ == "__main__":
     import os
     os.chdir(os.path.dirname(os.path.abspath(__file__)))
-    print(get_templates(database="..\\data\\db.sqlite3"))
+
+    tags = ["A"]
+    print(get_templates(tags=tags, database="..\\data\\db.sqlite3"))
     #print(get_quick_copy_buttons(database="..\\data\\db.sqlite3"))
     #print(get_categories(database="..\\data\\db.sqlite3"))
