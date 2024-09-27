@@ -105,6 +105,6 @@ def get_templates(category: str = None,
 if __name__ == "__main__":
     import os
     os.chdir(os.path.dirname(os.path.abspath(__file__)))
-    #print(get_templates(database="..\\data\\db.sqlite3"))
+    print(get_templates(database="..\\data\\db.sqlite3"))
     #print(get_quick_copy_buttons(database="..\\data\\db.sqlite3"))
-    print(get_categories(database="..\\data\\db.sqlite3"))
+    #print(get_categories(database="..\\data\\db.sqlite3"))

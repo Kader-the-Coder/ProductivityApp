@@ -57,9 +57,9 @@ def create_row_widgets(canvas, scrollable_frame, template, row_index):
     scrollable_frame.grid_columnconfigure(1, weight=0)
 
 
-def add_widgets(category, scrollable_frame, canvas):
+def add_widgets(category, scrollable_frame, canvas, tags=None):
     """Add widgets to scrollable frame."""
-    templates = database.get_templates(category)
+    templates = database.get_templates(category, tags)
     for i, template in enumerate(templates):
         create_row_widgets(canvas, scrollable_frame, template, i)
 
@@ -106,7 +106,7 @@ def add_scrollable_frame(frame):
     return canvas, scrollable_frame
 
 
-def set_widgets(frame):
+def set_widgets(frame, tags = None):
     """Set up a scrollable frame and add widgets within the given frame."""
     frame.grid_rowconfigure(0, weight=1)
     frame.grid_columnconfigure(0, weight=1)
@@ -125,12 +125,12 @@ def set_widgets(frame):
     categories = database.get_categories()
     for _, category in enumerate(categories):
         tab_frame = ttk.Frame(notebook)
-        tab_label = f"{category[0]}"
+        tab_label = f"({len(database.get_templates(category[0], tags))}) {category[0][:4]}..."
         notebook.add(tab_frame, text=tab_label)
 
         # Make tab scrollable and add widgets to tab.
         canvas, scrollable_frame = add_scrollable_frame(tab_frame)
-        add_widgets(category[0], scrollable_frame, canvas)
+        add_widgets(category[0], scrollable_frame, canvas, tags)
 
     notebook.grid(row=0, column=0, sticky="nsew")
 
@@ -151,4 +151,4 @@ def set_widgets(frame):
         # print(f"Selected Tab Text: {selected_text}")
 
 
-    notebook.bind("<<NotebookTabChanged>>", on_tab_change)  # DEBUG BINDING
+    # notebook.bind("<<NotebookTabChanged>>", on_tab_change)  # DEBUG BINDING

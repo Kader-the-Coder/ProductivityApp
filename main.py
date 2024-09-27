@@ -24,7 +24,7 @@ class ProductivityApp:
         root.geometry(f"{config.DEFAULT_WIDTH}x{config.DEFAULT_HEIGHT}")
         root.config(bg=config.COLOR_1)
         root.wm_attributes('-topmost', 1)
-        root.bind("<Button-1>", self.debug_widget)  # Debug binding
+        # root.bind("<Button-1>", self.debug_widget)  # Debug binding
 
     def configure_styles(self):
         """Set up the styles for the application."""
@@ -41,7 +41,7 @@ class ProductivityApp:
 
     def create_frames(self, root):
         """Create and place frames and widgets."""
-        
+
         # Add top frame
         self.add_frame(
             root, "frameTop.TFrame", frames_top.set_widgets,
@@ -65,14 +65,27 @@ class ProductivityApp:
 
     def create_body_section(self, root):
         """Create the body section with search entry and buttons."""
-        search_entry = ttk.Entry(root, style="entry.TEntry")
+
+        def on_text_change(*args):  # pylint:disable=unused-argument
+            """Get the current text from the StringVar - NEEDS TO BE OPTIMIZED!!!"""
+            current_text = text_var.get()
+            current_text = [tag.strip() for tag in current_text.split(",")] if current_text else None
+            print(current_text)
+            # Destroy each and recreate each widget in body frame (HIGH CPU - OPTIMIZATION NEEDED)
+            for widget in body_frame.winfo_children():
+                widget.destroy()
+            frames_body.set_widgets(body_frame, current_text)
+
+        text_var = tk.StringVar()
+        text_var.trace_add("write", on_text_change)
+        search_entry = ttk.Entry(root, style="entry.TEntry", text=text_var)
         search_entry.grid(
             row=1, column=1, columnspan=2,
             padx=config.PADDING, pady=config.PADDING,
             sticky="nsew"
         )
 
-        self.add_frame(
+        body_frame = self.add_frame(
             root, "frameBody.TFrame", frames_body.set_widgets,
             row=2, col=1, rowspan=5, colspan=2, width=280
         )
@@ -102,6 +115,8 @@ class ProductivityApp:
         )
         if widget_func:
             widget_func(frame)
+
+        return frame
 
     def configure_grid(self, root):
         """Configure grid row and column weights and minimum sizes."""
