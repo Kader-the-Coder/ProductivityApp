@@ -120,6 +120,15 @@ def add_scrollable_frame(frame):
 
 def set_widgets(frame, instance=None, tags = None, tab_opened=0):
     """Set up a scrollable frame and add widgets within the given frame."""
+
+    def on_tab_change(event):
+        """Store selected tab in instance class when reloading widgets."""
+        notebook = event.widget
+        selected_tab_id = notebook.select()
+        instance.default_tab = notebook.index(selected_tab_id)
+        # print(f"Selected Tab ID: {selected_tab_id}")  # DEBUG PRINT
+
+
     frame.grid_rowconfigure(0, weight=1)
     frame.grid_columnconfigure(0, weight=1)
 
@@ -146,21 +155,6 @@ def set_widgets(frame, instance=None, tags = None, tab_opened=0):
     notebook.grid(row=0, column=0, sticky="nsew")
     notebook.select(tab_opened)
 
-
-    # DEBUG -------------------------------------------------------------------
-
-
-    def on_tab_change(event):
-        """Handle tab change events."""
-        notebook = event.widget
-        selected_tab_id = notebook.select()
-        instance.default_tab = notebook.index(selected_tab_id)
-
-        # DEBUG
-        # selected_text = notebook.tab(selected_tab_id, "text")
-        print(f"Selected Tab ID: {selected_tab_id}")
-        # print(f"Selected Tab Index: {selected_index}")
-        # print(f"Selected Tab Text: {selected_text}")
-
+    # Detect and store a selected tab in instance class
     if instance:
-        notebook.bind("<<NotebookTabChanged>>", on_tab_change)  # DEBUG BINDING
+        notebook.bind("<<NotebookTabChanged>>", on_tab_change)

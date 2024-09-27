@@ -9,8 +9,7 @@ from data import config
 
 
 class ProductivityApp:
-    """Main application class for the Productivity App."""
-    
+    """Main application class for the Productivity App."""    
 
     def __init__(self, root):
         """Initialize the application."""
@@ -68,15 +67,25 @@ class ProductivityApp:
     def create_body_section(self, root):
         """Create the body section with search entry and buttons."""
 
-        def on_text_change(*args):  # pylint:disable=unused-argument
-            """Get the current text from the StringVar - NEEDS TO BE OPTIMIZED!!!"""
+        def on_text_change(*_args):
+            """
+            Get the current text from the StringVar - NEEDS OPTIMIZATION!!!
+            """
             current_text = text_var.get()
-            current_text = [tag.strip() for tag in current_text.split(",")] if current_text else None
-            print(current_text)
-            # Destroy each and recreate each widget in body frame (HIGH CPU - OPTIMIZATION NEEDED)
+
+            # Preprocess text into a list of tags.
+            current_text = [
+                tag.strip() for tag in current_text.split(",")
+                ] if current_text else None
+            print(current_text)  # DEBUG PRINT
+
+            # Destroy each and recreate each widget in body frame
+            # (HIGH CPU UTILIZATION - OPTIMIZATION NEEDED)
             for widget in body_frame.winfo_children():
                 widget.destroy()
-            frames_body.set_widgets(body_frame, self, current_text, self.default_tab)
+            frames_body.set_widgets(
+                body_frame, self, current_text, self.default_tab
+                )
 
         text_var = tk.StringVar()
         text_var.trace_add("write", on_text_change)
@@ -88,7 +97,8 @@ class ProductivityApp:
         )
 
         body_frame = self.add_frame(
-            root, "frameBody.TFrame", lambda frame: frames_body.set_widgets(frame, self),
+            root, "frameBody.TFrame",
+            lambda frame: frames_body.set_widgets(frame, self),
             row=2, col=1, rowspan=5, colspan=2, width=280
         )
 
