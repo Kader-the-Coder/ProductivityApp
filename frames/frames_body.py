@@ -13,12 +13,12 @@ def widget_layout(canvas, scrollable_frame, template, row_index):
     checked = tk.IntVar()
     checkbutton = tk.Checkbutton(
         scrollable_frame,
-        text=f"{template[0]}",
+        text=f"{template[1]}",
         anchor="w",
         variable=checked,
         )
     checkbutton.checked = checked
-    checkbutton.associated_text = template[1]
+    checkbutton.associated_text = template[2]
 
     button = tk.Button(scrollable_frame, text="Edit", width=4)
 
@@ -63,12 +63,16 @@ def set_widgets(frame, instance=None, tags = None, tab_opened=0):
     categories = database.get_categories()
     for _, category in enumerate(categories):
         tab_frame = ttk.Frame(notebook)
-        tab_label = f"({len(database.get_templates(category[0], tags))}) {category[0][:4]}..."
+        if tags:
+            name = tags[0] if len(tags) == 1 else None
+        else:
+            name = None
+        tab_label = f"({len(database.get_templates(category[0], name, tags))}) {category[0][:4]}..."
         notebook.add(tab_frame, text=tab_label)
 
         # Make tab scrollable and add widgets to tab.
         canvas, scrollable_frame = add_scrollable_frame(tab_frame)
-        add_widgets(widget_layout, scrollable_frame, canvas, category[0], tags)
+        add_widgets(widget_layout, scrollable_frame, canvas, category[0], name, tags)
 
     notebook.grid(row=0, column=0, sticky="nsew")
     notebook.select(tab_opened)

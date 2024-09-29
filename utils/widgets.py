@@ -46,14 +46,14 @@ def highlight_row(widgets):
 
 
 def add_widgets(widget_layout, scrollable_frame, canvas,
-                category=None, tags=None):
+                category=None, name=None, tags=None):
     """
     Add widgets to scrollable frame.
 
     widget_layout: A function with the following parameters:
         canvas, scrollable_frame, template, row_index
     """
-    templates = database.get_templates(category, tags)
+    templates = database.get_templates(category, name, tags)
     for i, template in enumerate(templates):
         widget_layout(canvas, scrollable_frame, template, i)
 
@@ -65,7 +65,8 @@ def configure_scroll_region(canvas, scrollable_frame):
     if bbox:  # Check if bbox is valid
         canvas.configure(scrollregion=bbox)
 
-        # Adjust the scrollregion if the content height is less than the canvas height
+        # Adjust the scrollregion if the content height is less than the
+        # canvas height
         canvas_height = canvas.winfo_height()
         if bbox[3] <= canvas_height:  # bbox[3] is the bottom y coordinate
             canvas.configure(scrollregion=(0, 0, 0, canvas_height))
