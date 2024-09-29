@@ -3,6 +3,7 @@
 import tkinter as tk
 from tkinter import ttk
 from data import config
+from frames import frames_update
 
 
 def set_widgets(frame):
@@ -18,35 +19,18 @@ def set_widgets(frame):
         new_window.title("Templates")
         new_window.wm_attributes('-topmost', 1)
 
-        # Get the position of the main window
+        # Ensure new window overlaps old window.
         root_width = root.winfo_width()
         root_height = root.winfo_height()
         root_x = root.winfo_x()
         root_y = root.winfo_y()
-
-        # Set the new window position to overlap the main window
         new_window.geometry(f"{root_width}x{root_height}+{root_x}+{root_y}")
 
-        # Add a label in the new window
-        label = tk.Label(new_window, text="This is a new window!")
-        label.pack(pady=20)
-
-        # Add a close button in the new window
-        close_button = tk.Button(new_window, text="Close", command=lambda: close_new_window(new_window, root))
-        close_button.pack(pady=10)
+        frames_update.set_widgets(root, new_window)
 
         new_window.protocol("WM_DELETE_WINDOW", lambda root=root, new_window=new_window: on_child_close(root, new_window))
 
-    def close_new_window(new_window, root):
-        """Close the new window and show the parent window again."""
-        new_width = new_window.winfo_width()
-        new_height = new_window.winfo_height()
-        new_x = new_window.winfo_x()
-        new_y = new_window.winfo_y()
 
-        root.geometry(f"{new_width}x{new_height}+{new_x}+{new_y}")
-        new_window.destroy()  # Close the new window
-        root.deiconify()  # Show the parent window again
 
     def on_child_close(root, new_window):
         """Closes the main window when the child is closed."""

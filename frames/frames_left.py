@@ -24,6 +24,6 @@ def set_widgets(frame):
             )
         button.text = data[1]
         button.pack(fill="x")
-    
+
     button_open = ttk.Button(frame, text="^", width=4, style="button.TButton",)
     button_open.pack(fill="x", side="bottom")
