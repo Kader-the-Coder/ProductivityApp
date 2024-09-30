@@ -1,3 +1,5 @@
+"""Module for configuring and setting the root window."""
+
 import tkinter as tk
 from tkinter import ttk
 from frames import (
@@ -7,11 +9,12 @@ from data import config
 from utils.copy import copy
 
 
-class TemplatePro:
+class TemplatePro():
     """Main application class for the Productivity App."""    
 
     def __init__(self, root):
         """Initialize the application."""
+        self.root = root
         self.configure_root_window(root)
         self.configure_styles()
         self.create_frames(root)
@@ -24,7 +27,6 @@ class TemplatePro:
         root.geometry(f"{config.DEFAULT_WIDTH}x{config.DEFAULT_HEIGHT}")
         root.config(bg=config.COLOR_1)
         root.wm_attributes('-topmost', 1)
-        # root.bind("<Button-1>", self.debug_widget)  # Debug binding
 
     def configure_styles(self):
         """Set up the styles for the application."""
@@ -96,8 +98,7 @@ class TemplatePro:
         )
 
         body_frame = self.add_frame(
-            root, "frameBody.TFrame",
-            lambda frame: frames_body.set_widgets(frame, self),
+            root, "frameBody.TFrame", frames_body.set_widgets,
             row=2, col=1, rowspan=5, colspan=2, width=280
         )
 
@@ -126,7 +127,7 @@ class TemplatePro:
 
             # Join all the associated texts with newline characters
             text_to_copy = "\n".join(associated_texts)
-                            
+
             copy(text_to_copy)
 
 
@@ -183,3 +184,11 @@ class TemplatePro:
         """Debug method to get the widget being clicked."""
         widget = event.widget  # Get the clicked widget
         print(f"Clicked widget: {widget} of type {type(widget).__name__}")
+
+    def reload_window(self):
+        """Clear and repopulate the window's content."""
+        for widget in self.root.winfo_children():
+            widget.destroy()
+
+        # Recreate the frames and widgets
+        self.create_frames(self.root)

@@ -2,11 +2,12 @@
 
 import tkinter as tk
 from tkinter import ttk
-# from data import config
+from frames.frames_bottom import open_new_window
 from utils import database
 from utils.widgets import (
     highlight_row, add_scrollable_frame, bind_scroll_events, add_widgets
 )
+
 
 def widget_layout(canvas, scrollable_frame, template, row_index):
     """Create and add row widgets to scrollable frame."""
@@ -20,7 +21,10 @@ def widget_layout(canvas, scrollable_frame, template, row_index):
     checkbutton.checked = checked
     checkbutton.associated_text = template[2]
 
-    button = tk.Button(scrollable_frame, text="Edit", width=4)
+    button = tk.Button(
+        scrollable_frame, text="Edit", width=4,
+        command=lambda frame=canvas: open_new_window(frame, template)
+        )
 
     # Place widgets
     checkbutton.grid(row=row_index, column=0, sticky="we")
@@ -67,7 +71,10 @@ def set_widgets(frame, instance=None, tags = None, tab_opened=0):
             name = tags[0] if len(tags) == 1 else None
         else:
             name = None
-        tab_label = f"({len(database.get_templates(category[0], name, tags))}) {category[0][:4]}..."
+        tab_label = (
+            f"({len(database.get_templates(category[0], name, tags))}) "
+            f"{category[0][:4]}..."
+            )
         notebook.add(tab_frame, text=tab_label)
 
         # Make tab scrollable and add widgets to tab.
