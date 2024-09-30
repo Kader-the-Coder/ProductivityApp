@@ -156,11 +156,12 @@ def get_tags(template_id:int, database:Optional[str] = "data\\db.sqlite3") -> Li
 
 
 def update_template(
-        template_id: int,
-        new_category: Optional[str] = None,
-        new_name: Optional[str] = None,
-        new_tags: Optional[List[str]] = None,
-        database: str = "data\\db.sqlite3"
+        template_id:int,
+        new_category:Optional[str] = None,
+        new_name:Optional[str] = None,
+        new_tags:Optional[List[str]] = None,
+        new_template_text:Optional[str] = None,
+        database:Optional[str] = "data\\db.sqlite3"
 ) -> None:
     """
     Updates a template with the provided information.
@@ -175,9 +176,12 @@ def update_template(
     Returns:
         None.
     """
+
+    # Format entries
     new_category = new_category.capitalize() if new_category else None
     new_name = new_name.capitalize() if new_name else None
     new_tags = [tag.capitalize() for tag in new_tags] if new_tags else []
+    new_template_text = new_template_text.strip()
 
     with sqlite3.connect(database) as db:
         cursor = db.cursor()
@@ -242,6 +246,14 @@ def update_template(
                         INSERT INTO template_tags (template_id, tag_id)
                         VALUES (?, ?)
                     ''', (template_id, new_tag_id))
+
+        # Update template text if provided
+        if new_template_text is not None:
+            cursor.execute('''
+                UPDATE templates
+                SET template_text = ?
+                WHERE template_id = ?
+            ''', (new_template_text, template_id))
 
         # Commit the changes
         db.commit()

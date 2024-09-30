@@ -23,13 +23,19 @@ def set_widgets(root, new_window):
         template_text = tk.Text(frame_top, height=5, wrap="word", undo=True, autoseparators=True)
 
         def add_update_template():
-            if not add_template_button.template:
+            if add_template_button.template:
                 new_category = category.get()
                 if new_category in [c[0] for c in database.get_categories()]:
                     new_name = name.get()
                     new_tags = [tag.strip() for tag in tags.get().split(",")]
                     new_template = template_text.get("1.0", tk.END).strip()
-                    database.update_template(add_template_button.template, new_category, new_name, new_tags, new_template)
+                    database.update_template(
+                        add_template_button.template,
+                        new_category,
+                        new_name,
+                        new_tags,
+                        new_template
+                        )
             else:
                 messagebox.showwarning("Warning", "UPDATE TO BE IMPLEMENTED")
 
