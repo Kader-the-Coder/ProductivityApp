@@ -45,7 +45,7 @@ def highlight_row(widgets):
             )
 
 
-def add_widgets(widget_layout, scrollable_frame, canvas,
+def add_widgets(widget_layout, instance, canvas, scrollable_frame,
                 category=None, name=None, tags=None):
     """
     Add widgets to scrollable frame.
@@ -55,7 +55,7 @@ def add_widgets(widget_layout, scrollable_frame, canvas,
     """
     templates = database.get_templates(category, name, tags)
     for i, template in enumerate(templates):
-        widget_layout(canvas, scrollable_frame, template, i)
+        widget_layout(canvas, instance, scrollable_frame, template, i)
 
 
 def configure_scroll_region(canvas, scrollable_frame):

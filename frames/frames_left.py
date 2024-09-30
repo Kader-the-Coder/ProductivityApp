@@ -6,7 +6,7 @@ from utils import database
 from utils.copy import copy
 
 
-def set_widgets(frame):
+def set_widgets(frame, _instance):
     """Set up and configure buttons in the given frame."""
 
     def copy_clicked(text):

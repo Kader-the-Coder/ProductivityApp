@@ -15,11 +15,11 @@ class TemplatePro():
     def __init__(self, root):
         """Initialize the application."""
         self.root = root
+        self.default_tab = 0
         self.configure_root_window(root)
         self.configure_styles()
         self.create_frames(root)
         self.configure_grid(root)
-        self.default_tab = 0
 
     def configure_root_window(self, root):
         """Configure the main window."""
@@ -101,7 +101,7 @@ class TemplatePro():
             root, "frameBody.TFrame", frames_body.set_widgets,
             row=2, col=1, rowspan=5, colspan=2, width=280
         )
-
+        
         def copy_checked():
             """
             Copies all associated texts from the checked Checkboxes in
@@ -155,7 +155,7 @@ class TemplatePro():
             pady=config.PADDING, sticky="nsew"
         )
         if widget_func:
-            widget_func(frame)
+            widget_func(frame, self)
 
         return frame
 

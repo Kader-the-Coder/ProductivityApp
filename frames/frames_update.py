@@ -9,7 +9,7 @@ from utils.widgets import (
 )
 
 
-def set_widgets(root, new_window, default:int = None):
+def set_widgets(root, instance, new_window, default:int = None):
     """Set up and configure buttons in the given frame."""
 
     def configure_top_frame():
@@ -27,27 +27,43 @@ def set_widgets(root, new_window, default:int = None):
         template_text = tk.Text(frame_top, height=5, wrap="word", undo=True, autoseparators=True)
 
         def add_update_template():
-            if add_template_button.template:
-                new_category = category.get()
-                if new_category in [c[0] for c in database.get_categories()]:
+            new_category = category.get()
+            if new_category in [c[0] for c in database.get_categories()]:
+                new_name = name.get()
+                new_tags = [tag.strip() for tag in tags.get().split(",")]
+                new_template = template_text.get("1.0", tk.END).strip()
+
+                # Update an existing template
+                if add_template_button.template:
                     new_name = name.get()
                     new_tags = [tag.strip() for tag in tags.get().split(",")]
                     new_template = template_text.get("1.0", tk.END).strip()
                     database.update_template(
                         add_template_button.template,
-                        new_category, 
+                        new_category,
                         new_name,
                         new_tags,
                         new_template
                         )
                     if default:
-                        close_new_window(new_window, root)
-            else:
-                messagebox.showwarning("Warning", "UPDATE TO BE IMPLEMENTED")
+                        close_new_window(root, new_window, instance)
+                    return
+
+                # Create a new template
+                database.create_template(
+                    new_name,
+                    new_template,
+                    new_category,
+                    new_tags,
+                    )
+                cancel_template()
+                return
+            
+            messagebox.showerror("ERROR", "Category does not exist.")  
 
         def cancel_template():
             if default:
-                close_new_window(new_window, root)
+                close_new_window(root, new_window, instance)
                 return
             category.delete(0, tk.END)
             name.delete(0, tk.END)
@@ -57,9 +73,10 @@ def set_widgets(root, new_window, default:int = None):
             add_template_button.configure(text="Insert")
 
         def delete_template():
-            new_template = template_text.get("1.0", tk.END).strip()  # Get text from the Text widget
-            if new_template:
-                messagebox.askokcancel("Warning", "Delete template?")
+            if add_template_button.template:
+                if messagebox.askokcancel("Warning", "Delete template?"):
+                    database.delete_template(add_template_button.template)
+                    messagebox.showinfo("Info", "Template has been deleted.")
 
         add_template_button = tk.Button(frame_top, text="Insert", command=add_update_template)
         add_template_button.template = None  # For editing templates
@@ -92,7 +109,7 @@ def set_widgets(root, new_window, default:int = None):
     def configure_middle_frame(category, name, tags, template_text, add_template_button):
         # Add all templates in the database
 
-        def widget_layout(canvas, scrollable_frame, template, row_index):
+        def widget_layout(canvas, _instance, scrollable_frame, template, row_index):
             """Create and add row widgets to scrollable frame."""
 
             def edit_template():
@@ -135,14 +152,14 @@ def set_widgets(root, new_window, default:int = None):
                 edit_template()
 
         canvas, scrollable_frame = add_scrollable_frame(frame_middle)
-        add_widgets(widget_layout, scrollable_frame, canvas)
+        add_widgets(widget_layout, instance, canvas, scrollable_frame)
 
     def configure_bottom_frame():
 
         # Add a close button
         close_button = tk.Button(
             frame_bottom, text="Close",
-            command=lambda: close_new_window(new_window, root)
+            command=lambda: close_new_window(root, new_window, instance)
         )
         close_button.grid(column=1, sticky="ew")
 
@@ -170,7 +187,7 @@ def set_widgets(root, new_window, default:int = None):
     new_window.grid_columnconfigure(0, weight=1)
 
 
-def close_new_window(new_window, root):
+def close_new_window(root, new_window, instance):
     """Close the new window and show the parent window again."""
     new_width = new_window.winfo_width()
     new_height = new_window.winfo_height()
@@ -180,4 +197,4 @@ def close_new_window(new_window, root):
     root.geometry(f"{new_width}x{new_height}+{new_x}+{new_y}")
     new_window.destroy()  # Close the new window
     root.deiconify()  # Show the parent window again
-    #get_app(root).reload_window()
+    instance.reload_window()

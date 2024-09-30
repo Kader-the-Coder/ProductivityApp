@@ -259,8 +259,112 @@ def update_template(
         db.commit()
 
 
+def create_template(
+        name: str,
+        template_text: str,
+        category: Optional[str] = None,
+        tags: Optional[List[str]] = None,
+        database: Optional[str] = "data\\db.sqlite3"
+    ) -> None:
+    """
+    Creates a template with the provided information.
 
-# UNIT TEST
+    Args:
+        name: The name of the template.
+        template_text: The text to store in the template.
+        category: The category associated with the template (optional).
+        tags: A list of new tags to associate with the template (optional).
+        database: The database to connect to (optional).
+
+    Returns:
+        None.
+    """
+
+    # Format entries
+    name = name.strip().capitalize()
+    template_text = template_text.strip()
+    category = category.capitalize() if category else None
+    tags = [tag.capitalize() for tag in tags] if tags else []
+
+    # Connect to the database
+    with sqlite3.connect(database) as db:
+        cursor = db.cursor()
+
+        # Get category_id or set to 0 if the category does not exist
+        category_id = 0  
+        if category:
+            # Check if category already exists
+            cursor.execute('''
+                SELECT category_id FROM category WHERE category_name = ?
+            ''', (category,))
+            result = cursor.fetchone()
+            
+            if result:
+                # Retrieve the id
+                category_id = result[0]
+
+        # Insert the template
+        cursor.execute('''
+            INSERT INTO templates (template_name, template_text, category_id)
+            VALUES (?, ?, ?)
+        ''', (name, template_text, category_id))
+
+        # Get the id of the newly inserted template
+        template_id = cursor.lastrowid
+
+        # Add tags
+        if tags:
+            for tag in tags:
+                # Insert the tag if it does not exist
+                cursor.execute('''
+                    INSERT OR IGNORE INTO tags (tag_name)
+                    VALUES (?)
+                ''', (tag,))
+                
+                # Retrieve the tag_id of the inserted or existing tag
+                cursor.execute('''
+                    SELECT tag_id FROM tags WHERE tag_name = ?
+                ''', (tag,))
+                tag_id = cursor.fetchone()[0]
+
+                # Associate the tag with the template
+                cursor.execute('''
+                    INSERT INTO template_tags (template_id, tag_id)
+                    VALUES (?, ?)
+                ''', (template_id, tag_id))
+
+        # Commit the transaction
+        db.commit()
+
+
+def delete_template(template_id: int, database: Optional[str] = "data\\db.sqlite3") -> None:
+    """
+    Deletes a template with the given template_id from the database.
+
+    Args:
+        template_id: The ID of the template to delete.
+        database: The database to connect to (optional, defaults to 'data\\db.sqlite3').
+
+    Returns:
+        None.
+    """
+    with sqlite3.connect(database) as db:
+        cursor = db.cursor()
+
+        # Delete associated entries in the template_tags table
+        cursor.execute('''
+            DELETE FROM template_tags WHERE template_id = ?
+        ''', (template_id,))
+
+        # Delete the template from the templates table
+        cursor.execute('''
+            DELETE FROM templates WHERE template_id = ?
+        ''', (template_id,))
+
+        db.commit()
+
+
+# UNIT TESTS
 if __name__ == "__main__":
     import os
     os.chdir(os.path.dirname(os.path.abspath(__file__)))

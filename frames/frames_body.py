@@ -9,7 +9,7 @@ from utils.widgets import (
 )
 
 
-def widget_layout(canvas, scrollable_frame, template, row_index):
+def widget_layout(canvas, instance, scrollable_frame, template, row_index):
     """Create and add row widgets to scrollable frame."""
     checked = tk.IntVar()
     checkbutton = tk.Checkbutton(
@@ -20,10 +20,9 @@ def widget_layout(canvas, scrollable_frame, template, row_index):
         )
     checkbutton.checked = checked
     checkbutton.associated_text = template[2]
-
     button = tk.Button(
         scrollable_frame, text="Edit", width=4,
-        command=lambda frame=canvas: open_new_window(frame, template)
+        command=lambda frame=canvas, instance=instance, default=template: open_new_window(frame, instance, default)
         )
 
     # Place widgets
@@ -44,13 +43,14 @@ def widget_layout(canvas, scrollable_frame, template, row_index):
 
 def set_widgets(frame, instance=None, tags = None, tab_opened=0):
     """Set up a scrollable frame and add widgets within the given frame."""
-
+    
     def on_tab_change(event):
         """Store selected tab in instance class when reloading widgets."""
         notebook = event.widget
         selected_tab_id = notebook.select()
         instance.default_tab = notebook.index(selected_tab_id)
 
+    tab_opened=instance.default_tab
     frame.grid_rowconfigure(0, weight=1)
     frame.grid_columnconfigure(0, weight=1)
 
@@ -79,7 +79,7 @@ def set_widgets(frame, instance=None, tags = None, tab_opened=0):
 
         # Make tab scrollable and add widgets to tab.
         canvas, scrollable_frame = add_scrollable_frame(tab_frame)
-        add_widgets(widget_layout, scrollable_frame, canvas, category[0], name, tags)
+        add_widgets(widget_layout, instance, canvas, scrollable_frame, category[0], name, tags)
 
     notebook.grid(row=0, column=0, sticky="nsew")
     notebook.select(tab_opened)

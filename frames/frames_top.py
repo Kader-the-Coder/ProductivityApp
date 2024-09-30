@@ -4,7 +4,7 @@ from tkinter import ttk
 from data import config
 
 
-def set_widgets(frame):
+def set_widgets(frame, _instance):
     """Set up and configure buttons in the given frame."""
     style = ttk.Style()
 
