@@ -14,7 +14,7 @@ def init_db(database: str = "data/db.sqlite3"):
     /* Table for templates */
     CREATE TABLE IF NOT EXISTS templates (
         template_id INTEGER PRIMARY KEY,
-        template_name VARCHAR(20) UNIQUE NOT NULL,
+        template_name VARCHAR(20) NOT NULL,
         template_text TEXT NOT NULL,
         category_id INT, -- Foreign key to category table
         created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
