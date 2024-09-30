@@ -9,6 +9,10 @@ TemplatePro is an application designed to help users manage templates with basic
 > - "Productivity" is subjective and may vary depending on the user’s experience.  
 > - [`tkinter`](https://docs.python.org/3/library/tkinter.html) was used because it is a built-in module and doesn’t come with any licensing complications.
 
+> **WARNING:**
+> - The code in this project is currently in a spaghetti state. It may not adhere to best practices for organization and readability. Refactoring and improving the code structure are ongoing tasks to enhance maintainability and clarity.
+> - Please review with care.
+
 ## Features
 
 - **Create and Manage Templates**: Users can create, remove, update, and delete (CRUD) templates.
